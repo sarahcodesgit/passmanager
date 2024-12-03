@@ -17,7 +17,7 @@
 #### 2. **Tech Stack**
 - **Programming Language:** Python.
 - **Database:** SQLite (for a simple tool), or a cloud database if needed.
-- **Encryption Library:** e.g., `cryptography` for Python or `libsodium`.
+- **Encryption Library:** e.g., `cryptography` for Python.
 
 #### 3. **Plan the Architecture**
 - **Core Components:**
@@ -31,6 +31,8 @@
 ### **Implementation Outline**
 
 #### 1. **Initialize the Project**
+**Create a Folder**:
+Open VSCode, click on `File > Open Folder`, and create/select a folder for your project (e.g., `PasswordManager`).
 Create a new project structure. For example:
 ```
 password_manager/
@@ -44,10 +46,16 @@ password_manager/
 ```
 
 #### 2. **Set Up Dependencies**
-For Python:
-```bash
-pip install cryptography
-```
+1. **Add Dependencies** to `requirements.txt`:
+   ```plaintext
+   cryptography
+   ```
+
+2. **Install Dependencies**:
+   Use `pip` to install:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 #### 3. **Develop the Encryption Module**
 Use AES for encryption in encryption.py:
@@ -161,8 +169,58 @@ if __name__ == "__main__":
 ```
 
 #### 7. **Secure the Master Key**
-- Store the master key securely (e.g., a hashed version in the database).
-- Use a secure environment variable for the key if needed.
+For a great place to store helper functions and utilities in utils.py:
+
+```python
+import random
+import string
+import shutil
+import os
+import hashlib
+
+def generate_password(length=16):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(characters) for _ in range(length))
+
+def validate_service_name(service):
+    if not service.strip():
+        raise ValueError("Service name cannot be empty.")
+    return service
+
+def validate_password_strength(password):
+    if len(password) < 8:
+        raise ValueError("Password must be at least 8 characters long.")
+    if not any(char.isdigit() for char in password):
+        raise ValueError("Password must include at least one number.")
+    if not any(char.isupper() for char in password):
+        raise ValueError("Password must include at least one uppercase letter.")
+    if not any(char.islower() for char in password):
+        raise ValueError("Password must include at least one lowercase letter.")
+    if not any(char in string.punctuation for char in password):
+        raise ValueError("Password must include at least one special character.")
+    return password
+
+def backup_database(source_file="passwords.db", backup_file="backup_passwords.db"):
+    shutil.copy(source_file, backup_file)
+    print(f"Backup created: {backup_file}")
+
+def restore_database(backup_file="backup_passwords.db", target_file="passwords.db"):
+    shutil.copy(backup_file, target_file)
+    print(f"Database restored from: {backup_file}")
+
+def get_env_variable(var_name, default=None):
+    value = os.getenv(var_name)
+    if value is None and default is None:
+        raise ValueError(f"Environment variable {var_name} is not set.")
+    return value or default
+
+def format_service_display(service, username, password):
+    return f"Service: {service}\nUsername: {username}\nPassword: {password}\n"
+
+def hash_master_password(master_password, salt):
+    return hashlib.pbkdf2_hmac('sha256', master_password.encode(), salt, 100000)
+```
+
 
 #### 8. **Optional Enhancements**
 - Add password strength analysis.
@@ -171,24 +229,6 @@ if __name__ == "__main__":
 - Create a graphical user interface (GUI).
 
 ---
-To create a password manager using Visual Studio Code (VSCode) and other tools, here’s a step-by-step guide to set up your development environment and workflow:
-
----
-
-
-### **Step 1: Set Up Visual Studio Code**
-1. **Install VSCode**: If not already installed, download and install VSCode from [here](https://code.visualstudio.com/).
-2. **Install Extensions**:
-   - **Python**: For writing and debugging Python code.
-   - **SQLite**: For managing the SQLite database.
-   - **Pylance**: For Python language support and linting.
-   - **Prettier**: For code formatting.
-
----
-
-### **Step 2: Set Up the Project**
-1. **Create a Folder**:
-   Open VSCode, click on `File > Open Folder`, and create/select a folder for your project (e.g., `PasswordManager`).
 
 2. **Initialize a Git Repository**:
    Run the following commands in the integrated terminal:
@@ -197,17 +237,6 @@ To create a password manager using Visual Studio Code (VSCode) and other tools, 
    ```
    This initializes version control for your project.
 
-3. **Create the Project Structure**:
-   Inside the folder, create the following structure:
-   ```
-   PasswordManager/
-   ├── main.py
-   ├── encryption.py
-   ├── database.py
-   ├── password_manager.py
-   ├── requirements.txt
-   ├── .gitignore
-   ```
 
 4. **Add `.gitignore`**:
    Prevent sensitive files from being pushed to GitHub by adding a `.gitignore` file with:
@@ -249,119 +278,6 @@ To create a password manager using Visual Studio Code (VSCode) and other tools, 
 
 ---
 
-### **Step 4: Code in VSCode**
-1. **Encryption Module**:
-   Open `encryption.py` and add:
-   ```python
-   from cryptography.fernet import Fernet
-
-   class EncryptionManager:
-       def __init__(self, key):
-           self.cipher = Fernet(key)
-
-       @staticmethod
-       def generate_key():
-           return Fernet.generate_key()
-
-       def encrypt(self, data):
-           return self.cipher.encrypt(data.encode())
-
-       def decrypt(self, token):
-           return self.cipher.decrypt(token).decode()
-   ```
-
-2. **Database Module**:
-   Open `database.py` and add:
-   ```python
-   import sqlite3
-
-   class DatabaseManager:
-       def __init__(self, db_name="passwords.db"):
-           self.conn = sqlite3.connect(db_name)
-           self.create_table()
-
-       def create_table(self):
-           query = """
-           CREATE TABLE IF NOT EXISTS passwords (
-               id INTEGER PRIMARY KEY,
-               service TEXT NOT NULL,
-               username TEXT NOT NULL,
-               password TEXT NOT NULL
-           )
-           """
-           self.conn.execute(query)
-           self.conn.commit()
-
-       def add_password(self, service, username, password):
-           query = "INSERT INTO passwords (service, username, password) VALUES (?, ?, ?)"
-           self.conn.execute(query, (service, username, password))
-           self.conn.commit()
-
-       def get_password(self, service):
-           query = "SELECT username, password FROM passwords WHERE service = ?"
-           return self.conn.execute(query, (service,)).fetchone()
-   ```
-
-3. **Password Manager Logic**:
-   Open `password_manager.py` and add:
-   ```python
-   from encryption import EncryptionManager
-   from database import DatabaseManager
-
-   class PasswordManager:
-       def __init__(self, key):
-           self.encryption = EncryptionManager(key)
-           self.db = DatabaseManager()
-
-       def add_password(self, service, username, password):
-           encrypted_password = self.encryption.encrypt(password)
-           self.db.add_password(service, username, encrypted_password)
-
-       def get_password(self, service):
-           result = self.db.get_password(service)
-           if result:
-               username, encrypted_password = result
-               password = self.encryption.decrypt(encrypted_password)
-               return username, password
-           return None
-   ```
-
-4. **Main Script**:
-   Open `main.py` and add:
-   ```python
-   from password_manager import PasswordManager
-
-   def main():
-       key = b'your_generated_key_here'  # Replace with a securely stored key
-       manager = PasswordManager(key)
-
-       while True:
-           print("1. Add Password\n2. Retrieve Password\n3. Exit")
-           choice = input("Choose an option: ")
-
-           if choice == "1":
-               service = input("Enter service name: ")
-               username = input("Enter username: ")
-               password = input("Enter password: ")
-               manager.add_password(service, username, password)
-               print("Password added successfully.")
-           elif choice == "2":
-               service = input("Enter service name: ")
-               result = manager.get_password(service)
-               if result:
-                   print(f"Username: {result[0]}, Password: {result[1]}")
-               else:
-                   print("Service not found.")
-           elif choice == "3":
-               break
-           else:
-               print("Invalid choice.")
-
-   if __name__ == "__main__":
-       main()
-   ```
-
----
 
 ### **Step 5: Test Your Application**
 1. **Run the App**:
@@ -461,18 +377,6 @@ if __name__ == "__main__":
 
 ---
 
-#### 2. **Install Dependencies**
-1. **Add Dependencies** to `requirements.txt`:
-   ```plaintext
-   cryptography
-   sqlite3
-   ```
-
-2. **Install Dependencies**:
-   Use `pip` to install:
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ---
 
@@ -690,33 +594,4 @@ To make your password manager more robust, user-friendly, and secure, here are a
      ```
 
 ---
-
-### **Documentation**
-- Add comments and docstrings for all modules and functions.
-- Include a `README.md` with usage instructions:
-  ```markdown
-  ## Password Manager
-
-  A secure password manager built with Python.
-
-  ### Features
-  - Add, retrieve, and delete passwords
-  - Encrypt stored passwords
-  - Backup database
-
-  ### Usage
-  1. Install dependencies:
-     ```bash
-     pip install -r requirements.txt
-     ```
-  2. Generate encryption key:
-     ```bash
-     python generate_key.py
-     ```
-  3. Run the app:
-     ```bash
-     python main.py
-     ```
-  ```
-
 
