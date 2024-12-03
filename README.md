@@ -451,3 +451,5 @@ If running the application using the UI run it with
 python ui.py
 ```
 A window should open, providing a graphical interface for your password manager.
+![image](https://github.com/user-attachments/assets/5fb7be25-5985-4a65-abc0-622630360204)
+
