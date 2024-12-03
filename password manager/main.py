@@ -1,7 +1,8 @@
 from password_manager import PasswordManager
+from encryption import EncryptionManager
 
 def main():
-    key = b'your_generated_key_here'  # Replace with a securely stored key
+    key = EncryptionManager.load_key()  # Properly load the key
     manager = PasswordManager(key)
 
     while True:
