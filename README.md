@@ -171,7 +171,8 @@ if __name__ == "__main__":
 
 #### 7. **Secure the Master Key**
 For a great place to store helper functions and utilities in utils.py:
-```
+
+```python
 import random
 import string
 import shutil
@@ -219,8 +220,9 @@ def format_service_display(service, username, password):
 
 def hash_master_password(master_password, salt):
     return hashlib.pbkdf2_hmac('sha256', master_password.encode(), salt, 100000)
-
 ```
+
+
 #### 8. **Optional Enhancements**
 - Add password strength analysis.
 - Implement a password generator.
