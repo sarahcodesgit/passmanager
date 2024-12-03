@@ -356,8 +356,6 @@ You can generate a secure encryption key using the `cryptography` library. Here'
        ```
      - On Windows, adjust file properties to restrict access.
 
----
-
 #### **Step 11: Create a Virtual Environment**
 1. **Create Virtual Environment**:
    ```bash
@@ -373,7 +371,6 @@ You can generate a secure encryption key using the `cryptography` library. Here'
      ```bash
      source env/bin/activate
      ```
-
 
 #### **Step 12: Test Your Application**
 1. **Run the App**:
