@@ -217,7 +217,13 @@ if __name__ == "__main__":
 ```
 
 #### 7. **Create a User Interface (optional)**
-For a simple CLI in ui.py:
+Install Tkinter (If Needed)
+
+```bash
+python -m tkinter
+```
+
+Create a simple CLI in ui.py:
 ```python
 import tkinter as tk
 from tkinter import messagebox
@@ -438,5 +444,10 @@ Username: sarahcodesgit, Password: notmyrealpassword
 3. Exit
 Choose an option:
 ```
----
+3. **Test Scenarios UI**:
 
+If running the application using the UI run it with
+```bash
+python ui.py
+```
+A window should open, providing a graphical interface for your password manager.
