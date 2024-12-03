@@ -219,36 +219,73 @@ if __name__ == "__main__":
 #### 7. **Create a User Interface (optional)**
 For a simple CLI in ui.py:
 ```python
+import tkinter as tk
+from tkinter import messagebox
+from encryption import EncryptionManager
 from password_manager import PasswordManager
 
-def main():
-    key = b'your_generated_key_here'  # Store securely or generate dynamically
-    manager = PasswordManager(key)
+class PasswordManagerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Password Manager")
 
-    while True:
-        print("1. Add Password\n2. Retrieve Password\n3. Exit")
-        choice = input("Choose an option: ")
+        # Load encryption key
+        self.key = EncryptionManager.load_key()
+        self.manager = PasswordManager(self.key)
 
-        if choice == "1":
-            service = input("Enter service name: ")
-            username = input("Enter username: ")
-            password = input("Enter password: ")
-            manager.add_password(service, username, password)
-            print("Password added successfully.")
-        elif choice == "2":
-            service = input("Enter service name: ")
-            result = manager.get_password(service)
-            if result:
-                print(f"Username: {result[0]}, Password: {result[1]}")
-            else:
-                print("Service not found.")
-        elif choice == "3":
-            break
+        # Create UI elements
+        self.service_label = tk.Label(root, text="Service:")
+        self.service_label.grid(row=0, column=0, padx=10, pady=10)
+        self.service_entry = tk.Entry(root, width=30)
+        self.service_entry.grid(row=0, column=1, padx=10, pady=10)
+
+        self.username_label = tk.Label(root, text="Username:")
+        self.username_label.grid(row=1, column=0, padx=10, pady=10)
+        self.username_entry = tk.Entry(root, width=30)
+        self.username_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        self.password_label = tk.Label(root, text="Password:")
+        self.password_label.grid(row=2, column=0, padx=10, pady=10)
+        self.password_entry = tk.Entry(root, width=30)
+        self.password_entry.grid(row=2, column=1, padx=10, pady=10)
+
+        self.add_button = tk.Button(root, text="Add Password", command=self.add_password)
+        self.add_button.grid(row=3, column=0, padx=10, pady=10)
+
+        self.retrieve_button = tk.Button(root, text="Retrieve Password", command=self.retrieve_password)
+        self.retrieve_button.grid(row=3, column=1, padx=10, pady=10)
+
+    def add_password(self):
+        service = self.service_entry.get()
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if service and username and password:
+            self.manager.add_password(service, username, password)
+            messagebox.showinfo("Success", "Password added successfully!")
+            self.service_entry.delete(0, tk.END)
+            self.username_entry.delete(0, tk.END)
+            self.password_entry.delete(0, tk.END)
         else:
-            print("Invalid choice.")
+            messagebox.showerror("Error", "All fields must be filled!")
+
+    def retrieve_password(self):
+        service = self.service_entry.get()
+
+        if service:
+            result = self.manager.get_password(service)
+            if result:
+                username, password = result
+                messagebox.showinfo("Password Retrieved", f"Username: {username}\nPassword: {password}")
+            else:
+                messagebox.showerror("Error", "Service not found!")
+        else:
+            messagebox.showerror("Error", "Service field must be filled!")
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = PasswordManagerApp(root)
+    root.mainloop()
 ```
 
 #### 8. **Secure the Master Key**
