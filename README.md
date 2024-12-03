@@ -45,7 +45,7 @@ password_manager/
 #### 2. **Set Up Dependencies**
 For Python:
 ```bash
-pip install cryptography sqlite3
+pip install cryptography
 ```
 
 #### 3. **Develop the Encryption Module**
