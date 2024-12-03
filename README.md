@@ -39,17 +39,18 @@ password_manager/
 ├── database.py
 ├── ui.py
 ├── utils.py
+├── password_manager.py
 └── requirements.txt
 ```
 
 #### 2. **Set Up Dependencies**
 For Python:
 ```bash
-pip install cryptography sqlite3
+pip install cryptography
 ```
 
 #### 3. **Develop the Encryption Module**
-Use AES for encryption:
+Use AES for encryption in encryption.py:
 ```python
 from cryptography.fernet import Fernet
 
@@ -69,7 +70,7 @@ class EncryptionManager:
 ```
 
 #### 4. **Database Layer**
-Store passwords securely:
+Store passwords securely in database.py:
 ```python
 import sqlite3
 
@@ -101,7 +102,7 @@ class DatabaseManager:
 ```
 
 #### 5. **Integrate Components**
-Combine encryption and database:
+Combine encryption and database in password_manager.py:
 ```python
 from encryption import EncryptionManager
 from database import DatabaseManager
@@ -125,7 +126,7 @@ class PasswordManager:
 ```
 
 #### 6. **Create a User Interface**
-For a simple CLI:
+For a simple CLI in ui.py:
 ```python
 from password_manager import PasswordManager
 
