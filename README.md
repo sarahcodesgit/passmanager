@@ -49,7 +49,6 @@ password_manager/
 1. **Add Dependencies** to `requirements.txt`:
    ```plaintext
    cryptography
-   sqlite3
    ```
 
 2. **Install Dependencies**:
